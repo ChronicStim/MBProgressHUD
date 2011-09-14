@@ -5,6 +5,7 @@
 //
 
 #import "MBProgressHUD.h"
+#import "MBProgressHUD+Custom.h"
 
 @interface MBProgressHUD ()
 
@@ -582,7 +583,7 @@
         //Gradient colours
         size_t gradLocationsNum = 2;
         CGFloat gradLocations[2] = {0.0f, 1.0f};
-        CGFloat gradColors[8] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.75f}; 
+        CGFloat gradColors[8] = {0.083f,0.154f,0.333f,0.0f,0.083f,0.154f,0.333f,0.75f};
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations, gradLocationsNum);
 		CGColorSpaceRelease(colorSpace);
@@ -607,7 +608,9 @@
 	float radius = 10.0f;
 	
     CGContextBeginPath(context);
-    CGContextSetGrayFillColor(context, 0.0f, self.opacity);
+    CGColorRef hudColorNoAlpha = [UIColor cptPrimaryColor].CGColor;
+    CGColorRef hudColorWithAlpha = CGColorCreateCopyWithAlpha(hudColorNoAlpha, self.opacity);
+    CGContextSetFillColorWithColor(context, hudColorWithAlpha);
     CGContextMoveToPoint(context, CGRectGetMinX(boxRect) + radius, CGRectGetMinY(boxRect));
     CGContextAddArc(context, CGRectGetMaxX(boxRect) - radius, CGRectGetMinY(boxRect) + radius, radius, 3 * (float)M_PI / 2, 0, 0);
     CGContextAddArc(context, CGRectGetMaxX(boxRect) - radius, CGRectGetMaxY(boxRect) - radius, radius, 0, (float)M_PI / 2, 0);
@@ -615,6 +618,7 @@
     CGContextAddArc(context, CGRectGetMinX(boxRect) + radius, CGRectGetMinY(boxRect) + radius, radius, (float)M_PI, 3 * (float)M_PI / 2, 0);
     CGContextClosePath(context);
     CGContextFillPath(context);
+    CGColorRelease(hudColorWithAlpha);
 }
 
 #pragma mark -
