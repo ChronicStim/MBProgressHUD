@@ -55,6 +55,8 @@
 @synthesize height;
 @synthesize xOffset;
 @synthesize yOffset;
+@synthesize minSize;
+@synthesize square;
 @synthesize margin;
 @synthesize dimBackground;
 
@@ -262,6 +264,8 @@
 		self.graceTime = 0.0f;
 		self.minShowTime = 0.0f;
 		self.removeFromSuperViewOnHide = NO;
+		self.minSize = CGSizeZero;
+		self.square = NO;
 		
 		self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
 		
@@ -323,7 +327,7 @@
         // Compute label dimensions based on font metrics if size is larger than max then clip the label width
         float lHeight = dims.height;
         float lWidth;
-        if (dims.width <= (frame.size.width - 2 * margin)) {
+        if (dims.width <= (frame.size.width - 4 * margin)) {
             lWidth = dims.width;
         }
         else {
@@ -359,17 +363,6 @@
 		
         // Add details label delatils text was set
         if (nil != self.detailsLabelText) {
-            // Get size of label text
-            dims = [self.detailsLabelText sizeWithFont:self.detailsLabelFont];
-			
-            // Compute label dimensions based on font metrics if size is larger than max then clip the label width
-            lHeight = dims.height;
-            if (dims.width <= (frame.size.width - 2 * margin)) {
-                lWidth = dims.width;
-            }
-            else {
-                lWidth = frame.size.width - 4 * margin;
-            }
 			
             // Set label properties
             detailsLabel.font = self.detailsLabelFont;
@@ -379,6 +372,12 @@
             detailsLabel.backgroundColor = [UIColor clearColor];
             detailsLabel.textColor = [UIColor whiteColor];
             detailsLabel.text = self.detailsLabelText;
+            detailsLabel.numberOfLines = 0;
+
+			CGFloat maxHeight = frame.size.height - self.height - 2*margin;
+			CGSize labelSize = [detailsLabel.text sizeWithFont:detailsLabel.font constrainedToSize:CGSizeMake(frame.size.width - 4*margin, maxHeight) lineBreakMode:detailsLabel.lineBreakMode];
+            lHeight = labelSize.height;
+            lWidth = labelSize.width;
 			
             // Update HUD size
             if (self.width < lWidth) {
@@ -402,6 +401,23 @@
             [self addSubview:detailsLabel];
         }
     }
+	
+	if (square) {
+		CGFloat max = MAX(self.width, self.height);
+		if (max <= frame.size.width - 2*margin) {
+			self.width = max;
+		}
+		if (max <= frame.size.height - 2*margin) {
+			self.height = max;
+		}
+	}
+	
+	if (self.width < minSize.width) {
+		self.width = minSize.width;
+	} 
+	if (self.height < minSize.height) {
+		self.height = minSize.height;
+	}
 }
 
 #pragma mark -
@@ -630,8 +646,12 @@
 	if (!self.superview) {
 		return;
 	}
+	
 	if ([self.superview isKindOfClass:[UIWindow class]]) {
 		[self setTransformForCurrentOrientation:YES];
+	} else {
+		self.bounds = self.superview.bounds;
+		[self setNeedsDisplay];
 	}
 }
 
