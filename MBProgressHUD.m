@@ -7,6 +7,8 @@
 #import "MBProgressHUD.h"
 #import "MBProgressHUD+Custom.h"
 
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+
 @interface MBProgressHUD ()
 
 - (void)hideUsingAnimation:(BOOL)animated;
