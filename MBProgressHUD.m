@@ -602,6 +602,7 @@ static const CGFloat kDetailsLabelFontSize = 12.f;
     if (self.color) {
         CGColorRef colorWithAlpha = CGColorCreateCopyWithAlpha(self.color.CGColor, 0.6f);
         CGContextSetFillColorWithColor(context, colorWithAlpha);
+        CGColorRelease(colorWithAlpha);
     } else {
         CGContextSetGrayFillColor(context, 0.0f, self.opacity);
     }
